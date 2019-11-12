@@ -1,5 +1,5 @@
-import 'package:sid_blog/db/PostService.dart';
-import 'package:sid_blog/models/post.dart';
+import 'package:sid_blog/db/UserService.dart';
+import 'package:sid_blog/models/user.dart';
 import 'package:flutter/material.dart';
 
 class AddPost extends StatefulWidget {
@@ -9,13 +9,13 @@ class AddPost extends StatefulWidget {
 
 class _AddPostState extends State<AddPost> {
   final GlobalKey<FormState> formkey = new GlobalKey();
-  Post post = Post(0, " ", " ");
+  User user = User(0, " ", " ");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("add post"),
+        title: Text("Add User"),
         elevation: 0.0,
       ),
       body: Form(
@@ -26,13 +26,11 @@ class _AddPostState extends State<AddPost> {
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
                 decoration: InputDecoration(
-                    labelText: "Post tilte", border: OutlineInputBorder()),
-                onSaved: (val) => post.title = val,
+                    labelText: "First Name", border: OutlineInputBorder()),
+                onSaved: (val) => user.title = val,
                 validator: (val) {
                   if (val.isEmpty) {
-                    return "title field cant be empty";
-                  } else if (val.length > 16) {
-                    return "title cannot have more than 16 characters ";
+                    return "First Name cant be empty";
                   }
                 },
               ),
@@ -41,11 +39,11 @@ class _AddPostState extends State<AddPost> {
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
                 decoration: InputDecoration(
-                    labelText: "Post body", border: OutlineInputBorder()),
-                onSaved: (val) => post.body = val,
+                    labelText: "Last Name", border: OutlineInputBorder()),
+                onSaved: (val) => user.body = val,
                 validator: (val) {
                   if (val.isEmpty) {
-                    return "body field cant be empty";
+                    return "Last Name cant be empty";
                   }
                 },
               ),
@@ -62,8 +60,6 @@ class _AddPostState extends State<AddPost> {
           Icons.add,
           color: Colors.white,
         ),
-        backgroundColor: Colors.red,
-        tooltip: "add a post",
       ),
     );
   }
@@ -73,9 +69,9 @@ class _AddPostState extends State<AddPost> {
     if (form.validate()) {
       form.save();
       form.reset();
-      post.date = DateTime.now().millisecondsSinceEpoch;
-      PostService postService = PostService(post.toMap());
-      postService.addPost();
+      user.date = DateTime.now().millisecondsSinceEpoch;
+      UserService postService = UserService(user.toMap());
+      postService.addUser();
     }
   }
 }

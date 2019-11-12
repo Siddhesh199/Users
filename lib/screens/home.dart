@@ -1,10 +1,9 @@
-import 'package:sid_blog/models/post.dart';
+import 'package:sid_blog/models/user.dart';
 import 'package:flutter/material.dart';
-import 'add_post.dart';
+import 'add_user.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:sid_blog/screens/view_post.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:sid_blog/screens/edit_user.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,12 +13,25 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   FirebaseDatabase _database = FirebaseDatabase.instance;
   String nodeName = "posts";
-  List<Post> postsList = <Post>[];
+  List<User> usersList = <User>[];
+  int _perPage = 12;
+
+  GlobalKey<RefreshIndicatorState> refreshKey;
+
+  Future<Null> refreshList() async {
+    await Future.delayed(Duration(seconds: 2));
+    setState(() {
+
+    });
+
+    return null;
+  }
+
 
   @override
   void initState() {
+    refreshKey = GlobalKey<RefreshIndicatorState>();
     _database.reference().child(nodeName).onChildAdded.listen(_childAdded);
-    _database.reference().child(nodeName).onChildRemoved.listen(_childRemoves);
     _database.reference().child(nodeName).onChildChanged.listen(_childChanged);
   }
 
@@ -27,69 +39,61 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Sid Blog"),
+        title: Text("Users List"),
         backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
       ),
       body: Container(
-        color: Colors.black87,
+        color: Colors.white,
         child: Column(
           children: <Widget>[
             Visibility(
-              visible: postsList.isEmpty,
+              visible: usersList.isEmpty,
               child: Center(
                 child: Container(
+                  padding: EdgeInsets.all(20.0),
                   alignment: Alignment.center,
-                  child: CircularProgressIndicator(),
+                  child: Text(
+                    'No Users',
+                    style: TextStyle(fontSize: 40.0),
+                  ),
                 ),
               ),
             ),
             Visibility(
-              visible: postsList.isNotEmpty,
+              visible: usersList.isNotEmpty,
               child: Flexible(
-                child: FirebaseAnimatedList(
-                  query: _database.reference().child('posts'),
-                  itemBuilder: (_, DataSnapshot snap,
-                      Animation<double> animation, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        child: ListTile(
-                          title: ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PostView(
-                                    postsList[index],
-                                  ),
-                                ),
-                              );
-                            },
-                            title: Text(
-                              postsList[index].title,
-                              style: TextStyle(
-                                  fontSize: 22.0, fontWeight: FontWeight.bold),
-                            ),
-                            trailing: Text(
-                              timeago.format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      postsList[index].date)),
-                              style:
-                                  TextStyle(fontSize: 14.0, color: Colors.grey),
-                            ),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(bottom: 14.0),
-                            child: Text(
-                              postsList[index].body,
-                              style: TextStyle(fontSize: 18.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
+                child: RefreshIndicator(
+                  key: refreshKey,
+                  onRefresh: (){
+                    return refreshList();
                   },
+                  child: FirebaseAnimatedList(
+                    query: _database.reference().child('posts').limitToFirst(_perPage),
+                    itemBuilder: (_, DataSnapshot snap,
+                        Animation<double> animation, int index) {
+                      return ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditUser(
+                                  usersList[index],
+                                ),
+                              ),
+                            );
+                          },
+                          title: Text(
+                            usersList[index].title,
+                            style: TextStyle(fontSize: 18.0),
+                          ),
+                        subtitle: Text(
+                          usersList[index].body,
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -102,11 +106,9 @@ class _HomePageState extends State<HomePage> {
               context, MaterialPageRoute(builder: (context) => AddPost()));
         },
         child: Icon(
-          Icons.edit,
+          Icons.add,
           color: Colors.white,
         ),
-        backgroundColor: Colors.red,
-        tooltip: "add a post",
       ),
     );
   }
@@ -114,29 +116,15 @@ class _HomePageState extends State<HomePage> {
   _childAdded(Event event) {
     setState(
       () {
-        postsList.add(
-          Post.fromSnapshot(event.snapshot),
+        usersList.add(
+          User.fromSnapshot(event.snapshot),
         );
       },
     );
   }
 
-  void _childRemoves(Event event) {
-    var deletedPost = postsList.singleWhere(
-      (post) {
-        return post.key == event.snapshot.key;
-      },
-    );
-
-    setState(
-      () {
-        postsList.removeAt(postsList.indexOf(deletedPost));
-      },
-    );
-  }
-
   void _childChanged(Event event) {
-    var changedPost = postsList.singleWhere(
+    var changedPost = usersList.singleWhere(
       (post) {
         return post.key == event.snapshot.key;
       },
@@ -144,8 +132,8 @@ class _HomePageState extends State<HomePage> {
 
     setState(
       () {
-        postsList[postsList.indexOf(changedPost)] =
-            Post.fromSnapshot(event.snapshot);
+        usersList[usersList.indexOf(changedPost)] =
+            User.fromSnapshot(event.snapshot);
       },
     );
   }

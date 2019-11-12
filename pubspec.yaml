@@ -26,6 +26,7 @@ dependencies:
   firebase_database: ^3.0.7
   firebase_core: ^0.4.0+9
   timeago: ^2.0.19
+  pull_to_refresh: ^1.5.7
 
 dev_dependencies:
   flutter_test:

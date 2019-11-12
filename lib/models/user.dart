@@ -1,5 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
-class Post{
+class User{
 
   static const KEY = "key";
   static const DATE = "date";
@@ -11,10 +11,10 @@ class Post{
   String title;
   String body;
 
-  Post(this.date, this.title, this.body);
+  User(this.date, this.title, this.body);
 
 
-  Post.fromSnapshot(DataSnapshot snap):
+  User.fromSnapshot(DataSnapshot snap):
         this.key = snap.key,
         this.body = snap.value[BODY],
         this.date = snap.value[DATE],

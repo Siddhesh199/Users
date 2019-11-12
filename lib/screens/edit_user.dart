@@ -1,25 +1,25 @@
-import 'package:sid_blog/db/PostService.dart';
-import 'package:sid_blog/models/post.dart';
+import 'package:sid_blog/db/UserService.dart';
+import 'package:sid_blog/models/user.dart';
 import 'package:sid_blog/screens/home.dart';
 import 'package:flutter/material.dart';
 
-class EditPost extends StatefulWidget {
-  final Post post;
+class EditUser extends StatefulWidget {
+  final User user;
 
-  EditPost(this.post);
+  EditUser(this.user);
 
   @override
-  _EditPostState createState() => _EditPostState();
+  _EditUserState createState() => _EditUserState();
 }
 
-class _EditPostState extends State<EditPost> {
+class _EditUserState extends State<EditUser> {
   final GlobalKey<FormState> formkey = new GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("edit post"),
+        title: Text("Edit User"),
         elevation: 0.0,
       ),
       body: Form(
@@ -29,15 +29,13 @@ class _EditPostState extends State<EditPost> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
-                initialValue: widget.post.title,
+                initialValue: widget.user.title,
                 decoration: InputDecoration(
                     labelText: "Post tilte", border: OutlineInputBorder()),
-                onSaved: (val) => widget.post.title = val,
+                onSaved: (val) => widget.user.title = val,
                 validator: (val) {
                   if (val.isEmpty) {
                     return "title field cant be empty";
-                  } else if (val.length > 16) {
-                    return "title cannot have more than 16 characters ";
                   }
                 },
               ),
@@ -45,12 +43,12 @@ class _EditPostState extends State<EditPost> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
-                initialValue: widget.post.body,
+                initialValue: widget.user.body,
                 decoration: InputDecoration(
                   labelText: "Post body",
                   border: OutlineInputBorder(),
                 ),
-                onSaved: (val) => widget.post.body = val,
+                onSaved: (val) => widget.user.body = val,
                 validator: (val) {
                   if (val.isEmpty) {
                     return "body field cant be empty";
@@ -72,11 +70,9 @@ class _EditPostState extends State<EditPost> {
           );
         },
         child: Icon(
-          Icons.edit,
+          Icons.add,
           color: Colors.white,
         ),
-        backgroundColor: Colors.red,
-        tooltip: "exit a post",
       ),
     );
   }
@@ -86,11 +82,11 @@ class _EditPostState extends State<EditPost> {
     if (form.validate()) {
       form.save();
       form.reset();
-      widget.post.date = DateTime.now().millisecondsSinceEpoch;
-      PostService postService = PostService(
-        widget.post.toMap(),
+      widget.user.date = DateTime.now().millisecondsSinceEpoch;
+      UserService userService = UserService(
+        widget.user.toMap(),
       );
-      postService.updatePost();
+      userService.updateUser();
     }
   }
 }

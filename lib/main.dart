@@ -7,7 +7,7 @@ void main() {
       debugShowCheckedModeBanner: false,
       home: HomePage(),
       theme: ThemeData(
-        primaryColor: Colors.black
+        primarySwatch: Colors.blue
       ),
     ),
   );
